@@ -43,10 +43,24 @@ public class Cube : MonoBehaviour {
 		_startPos = pos;
 	}
 
+    //removes all modifiers of one type
+    public void RemoveAllModifiersOfType(string name)
+    {
+        foreach (Transform anchor in MyAnchors)
+        {
+            for (int i = anchor.childCount-1; i>= 0; i--)
+            {
+                if (anchor.GetChild(i).name == name)
+                {
+                    Destroy(anchor.GetChild(i).gameObject);
+                }
+            }
+        }
+    }
 
 
     //parents the Transform to the anchor nearest the Ray
-    public void attachToClosestAnchor(Transform transformToAttach, RaycastHit hit)
+    public void attachToClosestAnchor(GameObject modifier, RaycastHit hit)
     {
         
         //find anchor nearest to ray
@@ -58,17 +72,19 @@ public class Cube : MonoBehaviour {
             if (null == closestAnchor) { closestAnchor = anchor; }
 
             float distance = Vector3.Distance(hit.point, anchor.position);
-            Debug.Log("Distance: "+distance);
             if (distance < minDist)
             {
-                Debug.Log("Set minDist");
                 closestAnchor = anchor;
                 minDist = distance;
             }
         }
 
-        transformToAttach.parent = closestAnchor;
-        transformToAttach.position = closestAnchor.position;
+        if (closestAnchor.childCount > 0)
+            DestroyImmediate(closestAnchor.GetChild(0).gameObject);
+
+        modifier.transform.forward = closestAnchor.forward;
+        modifier.transform.parent = closestAnchor;
+        modifier.transform.position = closestAnchor.position;
     }
 
 

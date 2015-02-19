@@ -91,14 +91,12 @@ public class InputManager : MonoBehaviour {
 
 			_totalTouchDelta = float.MaxValue;
 		}
-        else if ((Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift)) && Application.isEditor && Input.GetMouseButtonDown(0))//shift-click
+        else if (Application.isEditor && Input.GetMouseButtonDown(0))//shift-click
         {
             //Will not stay here
             //use default object for now
-            GameObject objToAttach = GameObject.Find("TestThruster");
-            if (null == objToAttach) { return; }
-            CubeModifierManager.SetModifier(objToAttach.transform);
-            CubeModifierManager.AnchorModifierToTap();
+
+     //       CubeModifierManager.AnchorModifierToTap();
         }
         else if (DidTap() && !(Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))) //&& UICamera.isOverUI == false) // got tap so create cube
         {

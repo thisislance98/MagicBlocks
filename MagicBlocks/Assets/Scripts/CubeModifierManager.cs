@@ -14,42 +14,31 @@ public class CubeModifierManager : MonoBehaviour {
         Instance = this;
     }
 
-
-
-    public static void SetModifier(Transform modifier)//sets the current modifier type
+    void OnTap()
     {
-        if (null != modifier && modifier.tag == "CubeModifier")
-        { 
-            _modifierType = modifier;
-        }
-    }
+        if (SelectionManager.Instance.GetSelection().tag != "CubeModifier")
+            return;
 
-    public static void AnchorModifierToTap()//safe anchor
-    {
-        if (null != _modifierType)
-        {
-            AnchorToTap(_modifierType);
-        }
-    }
-
-    private static void AnchorToTap(Transform transformToAttach)//anchors the transform, assuming that it is a modifier anchor
-    {
-        Ray ray;
         RaycastHit hit;
+        Ray ray;
 
         if (Utils.TouchCast(out hit, out ray))
         {
             if (hit.transform.tag == "Cube")
             {
-                Cube theCube = (GameObject.Find(hit.transform.name)).GetComponent<Cube>();//access the hit cube's script
-                if (null != theCube)
-                    theCube.attachToClosestAnchor(transformToAttach, hit);
+                GameObject newModifier = (GameObject)Instantiate(SelectionManager.Instance.GetSelection());
+                if (newModifier.GetComponent<Modifier>().CanHaveMultiplePerCube == false)
+                    hit.transform.gameObject.GetComponent<Cube>().RemoveAllModifiersOfType(newModifier.name);
+                AddModifier(newModifier, hit);     
             }
         }
+
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+
+    private void AddModifier(GameObject modifier, RaycastHit hit)//anchors the transform, assuming that it is a modifier anchor
+    {
+        hit.transform.gameObject.GetComponent<Cube>().attachToClosestAnchor(modifier, hit);        
+    }
+
 }

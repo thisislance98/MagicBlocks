@@ -27,6 +27,8 @@ public class CubeManager : MonoBehaviour {
 
 	void OnTap()
 	{
+        if (SelectionManager.Instance.GetSelection().tag != "Cube")
+            return;
 
 		RaycastHit hit;
 		Ray ray;
