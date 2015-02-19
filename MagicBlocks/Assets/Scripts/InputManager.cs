@@ -11,7 +11,7 @@ public class InputManager : MonoBehaviour {
 	GameObject _touchObj;
 	Vector3 _lastMousePos;
 	Transform _defaultSelectedItem;
-
+    
 	public static InputManager Instance;
 
 	void Awake()
@@ -91,11 +91,20 @@ public class InputManager : MonoBehaviour {
 
 			_totalTouchDelta = float.MaxValue;
 		}
-		else if (DidTap() ) //&& UICamera.isOverUI == false) // got tap so create cube
-		{
+        else if ((Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift)) && Application.isEditor && Input.GetMouseButtonDown(0))//shift-click
+        {
+            //Will not stay here
+            //use default object for now
+            GameObject objToAttach = GameObject.Find("TestThruster");
+            if (null == objToAttach) { return; }
+            CubeModifierManager.SetModifier(objToAttach.transform);
+            CubeModifierManager.AnchorModifierToTap();
+        }
+        else if (DidTap() && !(Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))) //&& UICamera.isOverUI == false) // got tap so create cube
+        {
 
-			Utils.SendMessageToAll("OnTap");
-		}
+            Utils.SendMessageToAll("OnTap");
+        }
 
 		// handle touch ended
 		if (Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && ( Input.GetTouch(0).phase == TouchPhase.Ended || Input.GetTouch(0).phase == TouchPhase.Canceled)))
@@ -103,7 +112,6 @@ public class InputManager : MonoBehaviour {
 			Utils.SendMessageToAll("OnTouchEnded");
 			_touchObj = null;
 		}
-
 	
 		_lastMousePos = Input.mousePosition;
 	}

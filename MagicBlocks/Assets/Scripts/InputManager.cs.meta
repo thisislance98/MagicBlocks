@@ -2,7 +2,9 @@ fileFormatVersion: 2
 guid: 52d3dbb808e304fa0aa294b7b321c1d3
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - SelectedItemPrefab: {instanceID: 0}
+  - _thruster: {fileID: 400012, guid: f01e375821a7d054cbfe7d901cff9f60, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

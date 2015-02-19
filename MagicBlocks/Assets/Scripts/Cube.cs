@@ -4,9 +4,12 @@ using System.Collections.Generic;
 
 public class Cube : MonoBehaviour {
 
+    Transform initializeAnchor;
 
 	public List<GameObject> _connectedCubes = new List<GameObject>();
 	static List<Transform> _myCubes = new List<Transform>();
+
+    public List<Transform> MyAnchors = new List<Transform>();
 
 	Vector3 _startPos;
 	bool _dying;
@@ -38,11 +41,38 @@ public class Cube : MonoBehaviour {
 		transform.position = pos;
 
 		_startPos = pos;
-
 	}
 
 
-	public void SetTouchRay(Ray ray)
+
+    //parents the Transform to the anchor nearest the Ray
+    public void attachToClosestAnchor(Transform transformToAttach, RaycastHit hit)
+    {
+        
+        //find anchor nearest to ray
+        float minDist = float.MaxValue;
+        Transform closestAnchor = null;
+
+        foreach (Transform anchor in MyAnchors)
+        {
+            if (null == closestAnchor) { closestAnchor = anchor; }
+
+            float distance = Vector3.Distance(hit.point, anchor.position);
+            Debug.Log("Distance: "+distance);
+            if (distance < minDist)
+            {
+                Debug.Log("Set minDist");
+                closestAnchor = anchor;
+                minDist = distance;
+            }
+        }
+
+        transformToAttach.parent = closestAnchor;
+        transformToAttach.position = closestAnchor.position;
+    }
+
+
+    public void SetTouchRay(Ray ray)
 	{
 		_touchRay = ray;
 	}
