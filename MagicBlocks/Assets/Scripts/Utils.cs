@@ -12,6 +12,7 @@ public class Utils : MonoBehaviour {
 		
 		for (int i=allObjs.Length-1; i >= 0; i--)
 		{
+            if (allObjs[i] == null) { break; }//ignore destroyed objects
 			allObjs[i].SendMessage(message,SendMessageOptions.DontRequireReceiver);
 			
 		}
@@ -25,6 +26,7 @@ public class Utils : MonoBehaviour {
 
 		for (int i=allObjs.Length-1; i >= 0; i--)
 		{
+            if (allObjs[i] == null) { break; }//ignore destroyed objects
 			allObjs[i].SendMessage(message,param,SendMessageOptions.DontRequireReceiver);
 
 		}

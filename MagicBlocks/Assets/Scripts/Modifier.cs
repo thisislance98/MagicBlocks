@@ -5,4 +5,12 @@ public class Modifier : MonoBehaviour {
 
     public bool CanHaveMultiplePerCube = true;
 
+    public bool CanParentCubes = false;
+
+    protected Transform _cube = null;
+
+    public void retrieveCube()
+    {
+        if (_cube == null && transform.parent != null && transform.parent.parent != null) { _cube = transform.parent.parent; }
+    }
 }

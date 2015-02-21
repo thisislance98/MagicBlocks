@@ -48,10 +48,33 @@ public class CubeManager : MonoBehaviour {
 
 		GameObject obj = (GameObject)Instantiate(CubePrefab, new Vector3(100,0,100), Quaternion.identity);
 
+        obj.renderer.material = GameObject.Find("CubeColorManager").GetComponent<CubeColorManager>().GetColor();
+
 		obj.SendMessage("Initialize",hit);
 
 		obj.GetComponent<Cube>().SetTouchRay(ray);
 
+        if (hit.transform.name == "Cube(Clone)")
+        {
+            obj.transform.parent = hit.transform;
+            Modifier m;
+            for (int i = 0; i < hit.transform.childCount; i++)
+            {
+                Transform child = hit.transform.GetChild(i);//anchor
+                for (int j = 0; j < child.childCount; j++)
+                {
+                    if ((m = child.GetChild(j).GetComponent<Modifier>()) != null && m.CanParentCubes)
+                    {
+                        obj.transform.parent = m.transform;
+                        Debug.Log("" + obj.name + " parented to " + m.name);
+                    }
+                }
+            }
+        }
+        else
+        {
+            //Debug.Log("Not parented");
+        }
 
 		_undoCubes.Add(obj);
 		Cube.GetMyCubes().Add(obj.transform);
@@ -90,8 +113,16 @@ public class CubeManager : MonoBehaviour {
 
 		if (Utils.TouchCast(out hit))
 		{
-			if (hit.transform.tag == "Cube")
-				Destroy(hit.transform.gameObject);
+            if (hit.transform.tag == "Cube")
+            {
+                //Deparent all children first
+                for (int i = 0; i < hit.transform.childCount; i++)
+                {
+                    if(hit.transform.GetChild(i).tag == "Cube")
+                        hit.transform.GetChild(i).parent = null;
+                }
+                Destroy(hit.transform.gameObject);
+            }
 		}
 		
 	}

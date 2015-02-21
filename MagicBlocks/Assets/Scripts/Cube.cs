@@ -9,12 +9,36 @@ public class Cube : MonoBehaviour {
 	public List<GameObject> _connectedCubes = new List<GameObject>();
 	static List<Transform> _myCubes = new List<Transform>();
 
+    public Material OnTriggerMaterial;
+    private Material _nonTriggerMaterial;
+
     public List<Transform> MyAnchors = new List<Transform>();
 
 	Vector3 _startPos;
+    Vector3 _lasPos;
 	bool _dying;
 	Ray _touchRay;
-	
+
+    private bool _isMoving = false;
+
+    bool _isTriggered;
+    public bool IsTriggered
+    {
+        get { return _isTriggered; }
+
+        set
+        {
+            Debug.Log("is trigger set");
+            _isTriggered = value;
+
+        }
+
+    }
+
+    void Awake()
+    {
+        _lasPos = transform.position;
+    }
 
 	public void Initialize(RaycastHit hit)
 	{
@@ -32,16 +56,82 @@ public class Cube : MonoBehaviour {
 			transform.rotation = rotation;
 			transform.position = pos;
 			
-		
-			ConnectToCube(hitTransform.rigidbody);
-			
 		}
 
 		transform.rotation = rotation;
 		transform.position = pos;
 
 		_startPos = pos;
+
+        _nonTriggerMaterial = renderer.material;
 	}
+
+    void Update()
+    {
+
+        _isMoving = transform.position != _lasPos;
+
+
+        _lasPos = transform.position;
+    }
+
+    void OnTap()
+    {
+        if (SelectionManager.Instance.GetSelection().tag != "Selector")
+            return;
+
+        RaycastHit hit;
+        Ray ray;
+
+        if (Utils.TouchCast(out hit, out ray))
+        {
+            if (hit.transform == transform)
+            {
+                OnTrigger();
+            }
+        }
+    }
+
+    void OnTrigger()
+    {
+        Debug.Log("OnTrigger");
+        IsTriggered = true;
+        gameObject.renderer.material = OnTriggerMaterial;
+        Transform child, subChild;
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            child = transform.GetChild(i);//this child is an anchor
+            //child.SendMessage("Trigger", SendMessageOptions.DontRequireReceiver);
+            for (int j = 0; j < child.childCount; j++)
+            {
+                subChild = child.GetChild(j);//this child is the cubemodifier
+                subChild.SendMessage("Trigger", SendMessageOptions.DontRequireReceiver);
+            }
+        }
+    }
+
+    void DeTrigger()
+    {
+        IsTriggered = false;
+        Transform child, subChild;
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            child = transform.GetChild(i);
+            //transform.GetChild(i).SendMessage("DeTrigger", SendMessageOptions.DontRequireReceiver);
+            for (int j = 0; j < child.childCount; j++)
+            {
+                subChild = child.GetChild(j);
+                subChild.SendMessage("DeTrigger", SendMessageOptions.DontRequireReceiver);
+            }
+        }
+        renderer.material = _nonTriggerMaterial;
+        Vector3 pos = transform.position;
+        pos = new Vector3(Mathf.Round(pos.x), Mathf.Round(pos.y), Mathf.Round(pos.z));
+        transform.position = pos;
+        
+    }
 
     //removes all modifiers of one type
     public void RemoveAllModifiersOfType(string name)
@@ -95,12 +185,8 @@ public class Cube : MonoBehaviour {
 
 	public Ray GetTouchRay()
 	{
-
 		return _touchRay;
 	}
-	
-
-
 
 	public static Vector3 GetBaryCenterOfCubes()
 	{
@@ -118,37 +204,27 @@ public class Cube : MonoBehaviour {
 
 	}
 
-	public void OnCollisionEnter(Collision other)
-	{
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.tag != "Cube")
+             return;
+        if (IsTriggered)
+            DeTrigger();
+        else
+            OnTrigger();
 
-		if (other.transform.tag == "Cube" && rigidbody != null && rigidbody.velocity.magnitude < 1)
-			ConnectToCube(other.rigidbody);
+        if (IsTriggered || _isMoving)
+        {
+            other.transform.gameObject.SendMessage("OnTrigger");
+        }
+    }
 
-//		float upAmount = Vector3.Dot(Vector3.up,transform.up);
-//		
-//		if (upAmount < .3f)
-//			Destroy(gameObject);
+    private bool IsMoving()
+    {
+        return _isMoving;
+    }
 
-	}
-	
-
-	public void ConnectToCube(Rigidbody cubeBody)
-	{
-
-		if (_connectedCubes.Contains(cubeBody.gameObject) || cubeBody.transform.tag != "Cube")
-			return;
-		
-		FixedJoint joint = transform.gameObject.AddComponent<FixedJoint>();
-		joint.connectedBody = cubeBody;
-			
-		joint.breakForce = .1f;
-		_connectedCubes.Add(cubeBody.gameObject);
-
-
-	}
-
-
-	void Die()
+    void Die()
 	{
 
 		Destroy(gameObject);

@@ -6,9 +6,6 @@ public class CubeModifierManager : MonoBehaviour {
 
     public static CubeModifierManager Instance;
 
-    private static Transform _modifierType;
-
-
     void Awake()
     {
         Instance = this;
@@ -29,7 +26,9 @@ public class CubeModifierManager : MonoBehaviour {
                 GameObject newModifier = (GameObject)Instantiate(SelectionManager.Instance.GetSelection());
                 if (newModifier.GetComponent<Modifier>().CanHaveMultiplePerCube == false)
                     hit.transform.gameObject.GetComponent<Cube>().RemoveAllModifiersOfType(newModifier.name);
-                AddModifier(newModifier, hit);     
+                AddModifier(newModifier, hit);
+                newModifier.GetComponent<Modifier>().retrieveCube();
+                Debug.Log(""+newModifier.name+" instantiated");
             }
         }
 
