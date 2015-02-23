@@ -54,22 +54,20 @@ public class CubeManager : MonoBehaviour {
 
 		obj.GetComponent<Cube>().SetTouchRay(ray);
 
-        if (hit.transform.name == "Cube(Clone)")
+        if (hit.transform.tag == "Cube")
         {
             obj.transform.parent = hit.transform;
             Modifier m;
-            for (int i = 0; i < hit.transform.childCount; i++)
+            Transform anchor = hit.transform.GetComponent<Cube>().getClosestAnchor(hit);//get nearest anchor
+            for (int j = 0; j < anchor.childCount; j++)
             {
-                Transform child = hit.transform.GetChild(i);//anchor
-                for (int j = 0; j < child.childCount; j++)
+                Transform modifier = anchor.GetChild(j);
+                if ((m = modifier.GetComponent<Modifier>()) != null && m.CanParentCubes)// && (subChild.name != "Rotator(Clone)" && subChild.childCount == 1))
                 {
-                    if ((m = child.GetChild(j).GetComponent<Modifier>()) != null && m.CanParentCubes)
-                    {
-                        obj.transform.parent = m.transform;
-                        Debug.Log("" + obj.name + " parented to " + m.name);
-                    }
+                    obj.transform.parent = m.transform;
                 }
             }
+            
         }
         else
         {

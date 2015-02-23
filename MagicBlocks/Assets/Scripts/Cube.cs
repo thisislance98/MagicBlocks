@@ -28,9 +28,7 @@ public class Cube : MonoBehaviour {
 
         set
         {
-            Debug.Log("is trigger set");
             _isTriggered = value;
-
         }
 
     }
@@ -73,6 +71,9 @@ public class Cube : MonoBehaviour {
 
 
         _lasPos = transform.position;
+
+        if (!IsChildTriggered() && IsTriggered) { DeTrigger(); }
+        else if (IsChildTriggered() && !IsTriggered) { OnTrigger(); }
     }
 
     void OnTap()
@@ -94,7 +95,6 @@ public class Cube : MonoBehaviour {
 
     void OnTrigger()
     {
-        Debug.Log("OnTrigger");
         IsTriggered = true;
         gameObject.renderer.material = OnTriggerMaterial;
         Transform child, subChild;
@@ -133,6 +133,70 @@ public class Cube : MonoBehaviour {
         
     }
 
+    private bool IsChildTriggered()
+    {
+        Transform child, subChild;
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            child = transform.GetChild(i);
+            //transform.GetChild(i).SendMessage("DeTrigger", SendMessageOptions.DontRequireReceiver);
+            for (int j = 0; j < child.childCount; j++)
+            {
+                subChild = child.GetChild(j);
+                if (subChild.gameObject.GetComponent<Modifier>() != null &&
+                    subChild.gameObject.GetComponent<Modifier>().IsTriggered) { return true; }
+            }
+        }
+        return false;
+    }
+
+    private bool HasModifier()
+    {
+        Transform child, subChild;
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            child = transform.GetChild(i);
+            //transform.GetChild(i).SendMessage("DeTrigger", SendMessageOptions.DontRequireReceiver);
+            for (int j = 0; j < child.childCount; j++)
+            {
+                subChild = child.GetChild(j);
+                if (subChild.gameObject.GetComponent<Modifier>() != null) { return true; }
+            }
+        }
+        return false;
+    }
+
+    public bool AnchorContainsModifier(Transform anchor, string modifier_name)
+    {
+        if (anchor == null) { return false; }
+        for (int i = 0; i < anchor.childCount; i++)
+        {
+            Modifier modifier = anchor.GetChild(i).GetComponent<Modifier>();
+            if (modifier != null && modifier.name == modifier_name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //removes the modifier from the anchor if it exists
+    public void RemoveModifierFromAnchor(Transform anchor, string modifier_name)
+    {
+        for (int i = 0; i < anchor.childCount; i++)
+        {
+            Modifier modifier = anchor.GetChild(i).GetComponent<Modifier>();
+            if (modifier != null && modifier.name == modifier_name)
+            {
+                modifier.transform.parent = null;//deparent from anchor
+                DestroyImmediate(modifier.gameObject);
+            }
+        }
+    }
+
+
     //removes all modifiers of one type
     public void RemoveAllModifiersOfType(string name)
     {
@@ -148,11 +212,9 @@ public class Cube : MonoBehaviour {
         }
     }
 
-
-    //parents the Transform to the anchor nearest the Ray
-    public void attachToClosestAnchor(GameObject modifier, RaycastHit hit)
+    //returns the anchor of the cube that is closest to the RaycastHit
+    public Transform getClosestAnchor(RaycastHit hit)
     {
-        
         //find anchor nearest to ray
         float minDist = float.MaxValue;
         Transform closestAnchor = null;
@@ -168,6 +230,15 @@ public class Cube : MonoBehaviour {
                 minDist = distance;
             }
         }
+
+        return closestAnchor;
+    }
+
+
+    //parents the Transform to the anchor nearest the Ray
+    public void attachToClosestAnchor(GameObject modifier, RaycastHit hit)
+    {
+        Transform closestAnchor = getClosestAnchor(hit);
 
         if (closestAnchor.childCount > 0)
             DestroyImmediate(closestAnchor.GetChild(0).gameObject);
@@ -210,12 +281,9 @@ public class Cube : MonoBehaviour {
              return;
         if (IsTriggered)
             DeTrigger();
-        else
-            OnTrigger();
-
-        if (IsTriggered || _isMoving)
+        else if(HasModifier())
         {
-            other.transform.gameObject.SendMessage("OnTrigger");
+            OnTrigger();
         }
     }
 

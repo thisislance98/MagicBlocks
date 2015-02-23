@@ -24,11 +24,22 @@ public class CubeModifierManager : MonoBehaviour {
             if (hit.transform.tag == "Cube")
             {
                 GameObject newModifier = (GameObject)Instantiate(SelectionManager.Instance.GetSelection());
-                if (newModifier.GetComponent<Modifier>().CanHaveMultiplePerCube == false)
-                    hit.transform.gameObject.GetComponent<Cube>().RemoveAllModifiersOfType(newModifier.name);
+                Cube cube = hit.transform.GetComponent<Cube>();
+                Transform anchor = hit.transform.GetComponent<Cube>().getClosestAnchor(hit);
+                
+                if (cube.AnchorContainsModifier(anchor, newModifier.name))
+                {
+                    cube.RemoveModifierFromAnchor(anchor, newModifier.name);
+                    DestroyImmediate(newModifier);
+                    return;//the modifier already exists at this anchor, remove it
+                }
+                
+                if (newModifier.GetComponent<Modifier>().CanHaveMultiplePerCube == false) //if this modifier type cannot have multiple instances on a cube
+                    cube.RemoveAllModifiersOfType(newModifier.name);
+
                 AddModifier(newModifier, hit);
                 newModifier.GetComponent<Modifier>().retrieveCube();
-                Debug.Log(""+newModifier.name+" instantiated");
+                //Debug.Log(""+newModifier.name+" instantiated");
             }
         }
 

@@ -13,10 +13,28 @@ public class Thruster : Modifier {
 
     void Update()
     {
-        if(transform.parent != null && transform.parent.parent != null && !transform.parent.parent.GetComponent<Cube>().IsTriggered)
+        if (transform.parent != null && transform.parent.parent != null && !transform.parent.parent.GetComponent<Cube>().IsTriggered)
+        {
+            DeTrigger();
             return;
+        }
 
-        Debug.Log("1");
+        if (!IsTriggered)//only trigger if not already triggered (do no re-trigger on each update)
+        {
+            Trigger();
+        }
          _cube.position += -transform.forward * Speed * Time.deltaTime;
+    }
+
+    void Trigger()
+    {
+        IsTriggered = true;
+        Particles.Play();
+    }
+
+    void DeTrigger()
+    {
+        IsTriggered = false;
+        Particles.Stop();
     }
 }

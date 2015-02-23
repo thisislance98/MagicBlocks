@@ -9,6 +9,8 @@ public class Modifier : MonoBehaviour {
 
     protected Transform _cube = null;
 
+    public bool IsTriggered = false;
+
     public void retrieveCube()
     {
         if (_cube == null && transform.parent != null && transform.parent.parent != null) { _cube = transform.parent.parent; }

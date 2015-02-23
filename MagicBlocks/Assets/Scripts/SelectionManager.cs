@@ -33,6 +33,10 @@ public class SelectionManager : MonoBehaviour {
         {
             _selection = SelectionPrefabs[3];
         }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            _selection = SelectionPrefabs[4];
+        }
 	}
 
     public GameObject GetSelection() { return _selection; }

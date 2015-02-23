@@ -104,5 +104,22 @@ public class Utils : MonoBehaviour {
 		return new Ray(new Vector3(floats[0],floats[1],floats[2]), new Vector3(floats[3],floats[4],floats[5]));
 	}
 
+    public static List<GameObject> getAllObjectsWithinDistanceOf(Transform focalObject, string tag, float distance)
+    {
+        List<GameObject> wantedObjects = new List<GameObject>();
+
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.tag == tag && (obj.transform.position - focalObject.transform.position).sqrMagnitude < distance)
+            {
+                wantedObjects.Add(obj);
+            }
+        }
+        
+        return wantedObjects;
+    }
+
 
 }
