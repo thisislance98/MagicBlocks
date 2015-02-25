@@ -29,6 +29,18 @@ public class Detonator : Modifier {
     {
         if (_hasDetonated) { return; }//can only detonate once
 
+        List<GameObject> objsEffected = Utils.getAllObjectsWithinDistanceOf(transform.parent.parent, "Cube", BlastRadius);
+        foreach (GameObject obj in objsEffected)
+        {
+            if (obj.rigidbody != null)
+            {
+                Vector3 pos = (obj.transform.position - transform.position);
+                obj.rigidbody.AddForce(pos.normalized * ExplosionForce * (1 - (pos.magnitude / BlastRadius)), ForceMode.Impulse);
+
+            }
+        }
+
+
         //transform.parent.parent.rigidbody.AddExplosionForce(ExplosionForce, transform.position, BlastRadius, 3f);
 
        /* 
@@ -41,12 +53,12 @@ public class Detonator : Modifier {
                 fragment.rigidbody.AddForce(dir * BlastForce * (1 - (distance / BlastRadius)), ForceMode.Impulse);
         }
         */
-        DeTrigger();
         _hasDetonated = true;
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        Trigger();
         /*
         List<GameObject> objsEffected = Utils.getAllObjectsWithinDistanceOf(transform.parent.parent, "Cube", BlastRadius);
         foreach (GameObject obj in objsEffected)
@@ -75,7 +87,7 @@ public class Detonator : Modifier {
     void Trigger()
     {
         IsTriggered = true;
-        //Detonate();
+        Detonate();
         DeTrigger();
     }
 
