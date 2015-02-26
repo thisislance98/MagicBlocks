@@ -46,6 +46,17 @@ public class Utils : MonoBehaviour {
 
 	}
 
+    public static bool LayerTouchCast(out RaycastHit hit, out Ray ray, int layerMask)
+    {
+        Vector3 touchpos = Input.mousePosition;
+        if (Input.touchCount == 1)
+            touchpos = Input.GetTouch(0).position;
+
+        ray = Camera.main.ScreenPointToRay(touchpos);
+
+        return Physics.Raycast(ray, out hit, 1 >> layerMask);
+    }
+
 	public static RaycastHit GetHit(Ray ray)
 	{
 		RaycastHit hit;
@@ -120,6 +131,4 @@ public class Utils : MonoBehaviour {
         
         return wantedObjects;
     }
-
-
 }
