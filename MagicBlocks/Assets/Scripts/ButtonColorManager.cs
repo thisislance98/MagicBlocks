@@ -9,8 +9,9 @@ public class ButtonColorManager : MonoBehaviour {
 	
 	}
 
-    void OnClick()
+    public void OnClick()
     {
+
         CubeColorManager c = GameObject.Find("CubeColorManager").GetComponent<CubeColorManager>();
         if (c != null)
         {

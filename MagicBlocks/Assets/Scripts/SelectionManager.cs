@@ -45,4 +45,12 @@ public class SelectionManager : MonoBehaviour {
     {
         _selection = selection;
     }
+
+    public void SetSelection(int index)
+    {
+        if (index < SelectionPrefabs.Length && index >= 0)
+        {
+            _selection = SelectionPrefabs[index];
+        }
+    }
 }

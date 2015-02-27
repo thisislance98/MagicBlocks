@@ -27,7 +27,7 @@ public class CubeManager : MonoBehaviour {
 
 	void OnTap()
 	{
-        if (SelectionManager.Instance.GetSelection().tag != "Cube")
+        if (SelectionManager.Instance.GetSelection().tag != "Cube" || UICamera.isOverUI)
             return;
 
 		RaycastHit hit;

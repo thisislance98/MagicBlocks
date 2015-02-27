@@ -13,7 +13,7 @@ public class CubeModifierManager : MonoBehaviour {
 
     void OnTap()
     {
-        if (SelectionManager.Instance.GetSelection().tag != "CubeModifier")
+        if (SelectionManager.Instance.GetSelection().tag != "CubeModifier" || UICamera.isOverUI)
             return;
 
         RaycastHit hit;
