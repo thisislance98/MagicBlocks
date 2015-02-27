@@ -5,7 +5,6 @@ public class CubeColorManager : MonoBehaviour
 {
     public Material[] CubeColors;
     private Material _currentColor;
-    public int ColorIndex = 0;
 
     public static CubeColorManager Instance;
 	// Use this for initialization
@@ -30,17 +29,9 @@ public class CubeColorManager : MonoBehaviour
 
     public void SetColor(int colorIndex)
     {
-        if (colorIndex >= 0 && colorIndex < CubeColors.Length)
+        if (colorIndex > 0 && colorIndex < CubeColors.Length)
         {
             _currentColor = CubeColors[colorIndex];
-        }
-    }
-
-    public void SetColor()
-    {
-        if (ColorIndex >= 0 && ColorIndex < CubeColors.Length)
-        {
-            _currentColor = CubeColors[ColorIndex];
         }
     }
 

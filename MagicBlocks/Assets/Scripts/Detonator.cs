@@ -22,18 +22,11 @@ public class Detonator : Modifier {
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.transform != transform.parent.parent && collider.transform.name != "Plane" && collider.transform.tag != "GUI")
-        {
-            //Debug.Log(collider.transform.tag +":"+collider.transform.name);//shows what caused the detonation
-            Cube cube = collider.transform.GetComponent<Cube>();
-            if (cube != null) { cube.DeTrigger(); }
-            Detonate();
-        }
+        Trigger();
     }
 
     private void Detonate()
     {
-        Debug.Log("boom");
         if (_hasDetonated) { return; }//can only detonate once
 
         List<GameObject> objsEffected = Utils.getAllObjectsWithinDistanceOf(transform.parent.parent, "Cube", BlastRadius);
@@ -42,7 +35,7 @@ public class Detonator : Modifier {
             if (obj.rigidbody != null)
             {
                 Vector3 pos = (obj.transform.position - transform.position);
-                obj.rigidbody.AddExplosionForce(ExplosionForce, transform.parent.parent.position, BlastRadius);
+                obj.rigidbody.AddForce(pos.normalized * ExplosionForce * (1 - (pos.magnitude / BlastRadius)), ForceMode.Impulse);
 
             }
         }
@@ -61,12 +54,11 @@ public class Detonator : Modifier {
         }
         */
         _hasDetonated = true;
-        Destroy(transform.parent.parent.gameObject);//the cube with the detonator is destroyed
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        //Trigger();
+        Trigger();
         /*
         List<GameObject> objsEffected = Utils.getAllObjectsWithinDistanceOf(transform.parent.parent, "Cube", BlastRadius);
         foreach (GameObject obj in objsEffected)
@@ -95,7 +87,7 @@ public class Detonator : Modifier {
     void Trigger()
     {
         IsTriggered = true;
-        //Detonate();
+        Detonate();
         DeTrigger();
     }
 
