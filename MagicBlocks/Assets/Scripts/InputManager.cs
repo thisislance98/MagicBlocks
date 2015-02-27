@@ -30,7 +30,7 @@ public class InputManager : MonoBehaviour {
 
 	public bool IsInteractingWithObject()
 	{
-		return _touchObj != null && _touchObj.tag == "Interactable";
+		return _touchObj != null;
 	}
 
 	// Update is called once per frame
@@ -75,7 +75,8 @@ public class InputManager : MonoBehaviour {
 				touchDelta = new Vector2(mouseDelta.x, mouseDelta.y);
 			}
 		
-			Utils.SendMessageToAll("OnDrag",touchDelta);
+			Utils.SendMessageToAll("OnCameraDrag",touchDelta);
+            //Utils.SendMessageToAll("OnDrag");
 		}
 
 		if (Input.touchCount == 2 && (Input.GetTouch(0).deltaPosition.magnitude > 0 || Input.GetTouch(1).deltaPosition.magnitude > 0))
@@ -91,13 +92,6 @@ public class InputManager : MonoBehaviour {
 
 			_totalTouchDelta = float.MaxValue;
 		}
-        else if (Application.isEditor && Input.GetMouseButtonDown(0))//shift-click
-        {
-            //Will not stay here
-            //use default object for now
-
-     //       CubeModifierManager.AnchorModifierToTap();
-        }
         else if (DidTap() && !(Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))) //&& UICamera.isOverUI == false) // got tap so create cube
         {
 

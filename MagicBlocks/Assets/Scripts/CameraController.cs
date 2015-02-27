@@ -100,6 +100,14 @@ public class CameraController : MonoBehaviour {
 		else if (Input.GetKey(KeyCode.Z))
 			horizontalMotion = -1;
 		
+        RaycastHit hit;
+        Ray ray;
+
+        if (Utils.TouchCast(out hit, out ray))
+        {
+            //if (hit.transform.tag == "GUI") { return; }//if there is a collision with a GUI element do not update the camera position
+        }
+
 		ChangePitch(pitch * PitchSpeed * Time.deltaTime);		        
 
 		Rotate(-Input.GetAxis("Horizontal") * RotateSpeed * Time.deltaTime);
@@ -187,15 +195,25 @@ public class CameraController : MonoBehaviour {
 		SecondPositionObj = secondPosObj;
 	}
 
-	void OnDrag(Vector2 delta)
+	void OnCameraDrag(Vector2 delta)
 	{
 		if (InputManager.Instance.IsInteractingWithObject() || IsControllingCamera() == false || _isFollowingTarget)
 			return;
-
+        Debug.Log("here");
 		Rotate(delta.x * DeviceRotateSpeed);
 		ChangePitch(delta.y * -DeviceRotateSpeed);
 
 	}
+
+    private bool isTouchUILayer()
+    {
+        Ray ray;
+        RaycastHit hit;
+        bool end;
+        end = Utils.LayerTouchCast(out hit, out ray, 5);
+        Debug.Log("Was touch layer: "+end);
+        return end;
+    }
 
 	void OnTwoFingerDrag()
 	{

@@ -111,7 +111,7 @@ public class Cube : MonoBehaviour {
         }
     }
 
-    void DeTrigger()
+    public void DeTrigger()
     {
         IsTriggered = false;
         Transform child, subChild;
