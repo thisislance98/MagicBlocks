@@ -7,6 +7,8 @@ public class InputManager : MonoBehaviour {
 
 	public float MaxTapTime = 2.0f;
 	float _tapTime;
+    bool _isDragging = false;
+    public bool IsInteractingWithUI = false;
 	float _totalTouchDelta;
 	GameObject _touchObj;
 	Vector3 _lastMousePos;
@@ -51,10 +53,12 @@ public class InputManager : MonoBehaviour {
 				if (Utils.TouchCast(out hit))
 				{
 					_touchObj = hit.transform.gameObject;
+                    if (UICamera.isOverUI) { IsInteractingWithUI = true; }
 				}
 
 				_tapTime = 0;
 				_totalTouchDelta = 0;
+                
 			}
 			else if (Input.GetTouch(0).phase == TouchPhase.Moved)
 				_totalTouchDelta += Input.GetTouch(0).deltaPosition.magnitude;
@@ -63,8 +67,9 @@ public class InputManager : MonoBehaviour {
 		}	
 
 		// handle one finger drag
-		if (Input.touchCount == 1 && Input.GetTouch(0).deltaPosition.magnitude > 0 || (Application.isEditor && Input.GetMouseButton(0) && Input.mousePosition != _lastMousePos ))
+		if (Input.touchCount == 1 && Input.GetTouch(0).deltaPosition.magnitude > 0 || (Application.isEditor && Input.GetMouseButton(0) && (Input.mousePosition != _lastMousePos || _isDragging)))
 		{
+            _isDragging = true;
 			Vector2 touchDelta;
 
 			if (Input.touchCount == 1)
@@ -74,10 +79,20 @@ public class InputManager : MonoBehaviour {
 				Vector3 mouseDelta = Input.mousePosition - _lastMousePos;
 				touchDelta = new Vector2(mouseDelta.x, mouseDelta.y);
 			}
-		
-			Utils.SendMessageToAll("OnCameraDrag",touchDelta);
+		    if(!IsInteractingWithUI)
+			    Utils.SendMessageToAll("OnCameraDrag",touchDelta);
+
+            if (Input.mousePosition == _lastMousePos)
+            {
+                Debug.Log("here");
+                _isDragging = false;
+            }
             //Utils.SendMessageToAll("OnDrag");
 		}
+        if (DidTap() && !_isDragging)// got tap so create cube
+        {
+            Utils.SendMessageToAll("OnTap");
+        }
 
 		if (Input.touchCount == 2 && (Input.GetTouch(0).deltaPosition.magnitude > 0 || Input.GetTouch(1).deltaPosition.magnitude > 0))
 		{
@@ -92,17 +107,13 @@ public class InputManager : MonoBehaviour {
 
 			_totalTouchDelta = float.MaxValue;
 		}
-        else if (DidTap() && !(Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift))) //&& UICamera.isOverUI == false) // got tap so create cube
-        {
-
-            Utils.SendMessageToAll("OnTap");
-        }
 
 		// handle touch ended
 		if (Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && ( Input.GetTouch(0).phase == TouchPhase.Ended || Input.GetTouch(0).phase == TouchPhase.Canceled)))
 		{
 			Utils.SendMessageToAll("OnTouchEnded");
 			_touchObj = null;
+            IsInteractingWithUI = false;
 		}
 	
 		_lastMousePos = Input.mousePosition;

@@ -197,9 +197,8 @@ public class CameraController : MonoBehaviour {
 
 	void OnCameraDrag(Vector2 delta)
 	{
-		if (InputManager.Instance.IsInteractingWithObject() || IsControllingCamera() == false || _isFollowingTarget)
+		if ((InputManager.Instance.IsInteractingWithObject() && InputManager.Instance.GetTouchObj().name != "Plane" )|| IsControllingCamera() == false || _isFollowingTarget || UICamera.isOverUI)
 			return;
-        Debug.Log("here");
 		Rotate(delta.x * DeviceRotateSpeed);
 		ChangePitch(delta.y * -DeviceRotateSpeed);
 

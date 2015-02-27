@@ -11,11 +11,6 @@ public class ButtonSelectionManager : MonoBehaviour {
 	
 	public void OnClick () 
     {
-        SelectionManager s = GameObject.Find("SelectionManager").GetComponent<SelectionManager>();
-        if (s != null)
-        {
-            s.SetSelection(MyIndex);
-            Debug.Log("Set selection index: " + MyIndex);
-        }
+        SelectionManager.Instance.SetSelection(MyIndex);
 	}
 }

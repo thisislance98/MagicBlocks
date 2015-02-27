@@ -11,11 +11,6 @@ public class ButtonColorManager : MonoBehaviour {
 
     public void OnClick()
     {
-
-        CubeColorManager c = GameObject.Find("CubeColorManager").GetComponent<CubeColorManager>();
-        if (c != null)
-        {
-            c.SetColor(MyIndex);
-        }
+        CubeColorManager.Instance.SetColor(MyIndex);
     }
 }
