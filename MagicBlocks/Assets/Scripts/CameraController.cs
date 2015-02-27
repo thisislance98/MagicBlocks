@@ -197,7 +197,7 @@ public class CameraController : MonoBehaviour {
 
 	void OnCameraDrag(Vector2 delta)
 	{
-		if ((InputManager.Instance.IsInteractingWithObject() && InputManager.Instance.GetTouchObj().name != "Plane" )|| IsControllingCamera() == false || _isFollowingTarget || UICamera.isOverUI)
+		if (IsControllingCamera() == false || _isFollowingTarget)
 			return;
 		Rotate(delta.x * DeviceRotateSpeed);
 		ChangePitch(delta.y * -DeviceRotateSpeed);
@@ -210,7 +210,6 @@ public class CameraController : MonoBehaviour {
         RaycastHit hit;
         bool end;
         end = Utils.LayerTouchCast(out hit, out ray, 5);
-        Debug.Log("Was touch layer: "+end);
         return end;
     }
 

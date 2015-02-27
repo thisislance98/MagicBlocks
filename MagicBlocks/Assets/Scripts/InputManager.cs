@@ -82,17 +82,9 @@ public class InputManager : MonoBehaviour {
 		    if(!IsInteractingWithUI)
 			    Utils.SendMessageToAll("OnCameraDrag",touchDelta);
 
-            if (Input.mousePosition == _lastMousePos)
-            {
-                Debug.Log("here");
-                _isDragging = false;
-            }
             //Utils.SendMessageToAll("OnDrag");
 		}
-        if (DidTap() && !_isDragging)// got tap so create cube
-        {
-            Utils.SendMessageToAll("OnTap");
-        }
+        
 
 		if (Input.touchCount == 2 && (Input.GetTouch(0).deltaPosition.magnitude > 0 || Input.GetTouch(1).deltaPosition.magnitude > 0))
 		{
@@ -107,11 +99,16 @@ public class InputManager : MonoBehaviour {
 
 			_totalTouchDelta = float.MaxValue;
 		}
+        else if (DidTap() && !_isDragging)// got tap so create cube
+        {
+            Utils.SendMessageToAll("OnTap");
+        }
 
 		// handle touch ended
 		if (Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && ( Input.GetTouch(0).phase == TouchPhase.Ended || Input.GetTouch(0).phase == TouchPhase.Canceled)))
 		{
 			Utils.SendMessageToAll("OnTouchEnded");
+            _isDragging = false;
 			_touchObj = null;
             IsInteractingWithUI = false;
 		}
